@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <title>NORMAL</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+    <style>
+    body,
+    html,
+    #container {
+        overflow: hidden;
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        font-family: "微软雅黑";
+    }
+    .location{
+        position: fixed;
+        height: 150px;
+        width: 240px;
+        bottom: 20px;
+        right: 20px;
+        background-color: #fff;
+        z-index: 100;
+        border-radius: 10px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-around;
+        align-items: center;
+        
+    }
+    .text{
+        height: 40px;
+        text-overflow: ellipsis;
+    }
+    .button{
+        height: 40px;
+        width: 100px;
+        background-color: #ff6700;
+        border-radius: 5px;
+        line-height: 40px;
+        text-align: center;
+        color: #fff;
+    }
+    .button:hover{
+        box-shadow: 4px 4px 10px #b5b5b5;
+    }
+    </style>
+    
+    <script src="//api.map.baidu.com/api?type=webgl&v=1.0&ak=uE26khWBMTGrKg70KE2VSW1eooAlKKgl"></script>
+</head>
+<body>
+    <div class="location">
+        <div class="text">经纬：</div>
+        <div class="button">定位</div>
+    </div>
+    <div id="container"></div>
+</body>
+    <script>
+        
+        var map = new BMapGL.Map('container');
+        map.centerAndZoom(new BMapGL.Point(120.025, 30.298), 15);
+        map.enableScrollWheelZoom(true);
+
+        var button = document.getElementsByClassName('button');
+        var text = document.getElementsByClassName('text');
+        let x,y;
+        button[0].addEventListener('click', ()=>{
+            if (navigator.geolocation){
+                text[0].innerHTML = "定位中...";
+                navigator.geolocation.getCurrentPosition(showPosition,showError);
+            }else{
+                alert("该浏览器不支持获取地理位置。");
+            }
+        });
+        
+
+        function showPosition(position){
+            //偏移量
+            // x = position.coords.latitude+0.0148;
+            // y = position.coords.longitude-0.0892;
+            x = position.coords.latitude+0.004;
+            y = position.coords.longitude+0.016;
+            text[0].innerHTML="纬度：" + x + "<br>经度 :" + y;
+            theLocation();
+        }
+        
+        function showError(error){
+        switch(error.code)
+        {
+            case error.PERMISSION_DENIED:
+                text[0].innerHTML="用户拒绝对获取地理位置的请求。"
+                break;
+            case error.POSITION_UNAVAILABLE:
+                text[0].innerHTML="位置信息是不可用的。"
+                break;
+            case error.TIMEOUT:
+                text[0].innerHTML="请求用户地理位置超时。"
+                break;
+            case error.UNKNOWN_ERROR:
+                text[0].innerHTML="未知错误。"
+                break;
+            }
+        }
+
+        // 用经纬度设置地图中心点
+        function theLocation(){
+            if(x != "" && y != ""){
+                map.clearOverlays(); 
+                var new_point = new BMapGL.Point(y,x);
+                var marker = new BMapGL.Marker(new_point);  // 创建标注
+                map.addOverlay(marker);              // 将标注添加到地图中
+                map.panTo(new_point);      
+            }
+        }
+
+    </script>
+</html>
+
